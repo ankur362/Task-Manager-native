@@ -49,7 +49,7 @@ const RegisterScreen = ({ navigation }) => {
             }
 
             await registerUser(formData).unwrap();
-            navigation.navigate('Login'); // Redirect to login after successful registration
+            navigation.navigate('Login'); 
           } catch (err) {
             console.error(err);
           }

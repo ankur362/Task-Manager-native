@@ -1,18 +1,27 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, ScrollView } from 'react-native';
-import { useGetCompletedTasksQuery, useDeleteTaskMutation } from '../api/tasksApi';
+import React, { useCallback } from 'react';
+import {
+  View, Text, ActivityIndicator, StyleSheet, ScrollView
+} from 'react-native';
+import { useRoute, useFocusEffect } from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faListCheck } from '@fortawesome/free-solid-svg-icons';
+import { useGetAllTasksQuery } from '../api/tasksApi';
 
-const CompletedTasksScreen = () => {
-  const { data: completedTasks, isLoading, error } = useGetCompletedTasksQuery();
-  const [deleteTask] = useDeleteTaskMutation();
+const TaskListScreen = () => {
+  const route = useRoute();
+  const { categoryId, categoryName } = route.params;
 
-  const handleDeleteTask = async (taskId) => {
-    try {
-      await deleteTask(taskId);
-    } catch (err) {
-      console.error('Failed to delete task:', err);
-    }
-  };
+ 
+  const { data: allTasks, isLoading, error, refetch } = useGetAllTasksQuery();
+
+  
+  const filteredTasks = allTasks?.filter(task => task.category === categoryId) || [];
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   if (isLoading) {
     return (
@@ -25,35 +34,32 @@ const CompletedTasksScreen = () => {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Error loading completed tasks. Please try again later.</Text>
+        <Text style={styles.errorText}>Error loading tasks. Please try again later.</Text>
       </View>
     );
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Completed Tasks</Text>
+      <View style={styles.header}>
+        <FontAwesomeIcon icon={faListCheck} size={22} color="#fff" />
+        <Text style={styles.headerText}>{categoryName} Tasks</Text>
+      </View>
 
-      {completedTasks?.length === 0 ? (
-        <Text style={styles.noTasksText}>No completed tasks found.</Text>
-      ) : (
-        completedTasks?.map((task) => (
-          <View key={task.id} style={styles.taskCard}>
-            <View style={styles.taskInfo}>
-              <Text style={styles.taskTitle}>{task.title}</Text>
-              <Text style={styles.taskDescription}>{task.description}</Text>
-              
-            </View>
-            <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteTask(task.id)}>
-              <Text style={styles.deleteText}>🗑️</Text>
-            </TouchableOpacity>
+      {filteredTasks.length > 0 ? (
+        filteredTasks.map((task) => (
+          <View key={task._id} style={styles.taskCard}>
+            <Text style={styles.taskTitle}>{task.title}</Text>
+            <Text style={styles.taskDescription}>{task.description}</Text>
+            <Text style={styles.taskMeta}>Priority: {task.priority || "N/A"}</Text>
           </View>
         ))
+      ) : (
+        <Text style={styles.noTasksText}>No tasks found for this category.</Text>
       )}
     </ScrollView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -61,45 +67,50 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#007bff',
+    padding: 12,
+    borderRadius: 8,
     marginBottom: 15,
+    justifyContent: 'center',
   },
-  noTasksText: {
-    textAlign: 'center',
-    color: '#666',
-    marginTop: 20,
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginLeft: 8,
   },
   taskCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     backgroundColor: '#e6f4ea',
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 4,
+    elevation: 2,
   },
   taskTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
   },
   taskDescription: {
     fontSize: 14,
     color: '#555',
     marginTop: 5,
   },
-  taskDate: {
-    fontSize: 12,
-    color: '#777',
+  taskMeta: {
+    fontSize: 14,
+    color: '#888',
     marginTop: 5,
   },
-  deleteButton: {
-    padding: 10,
-  },
-  deleteText: {
-    fontSize: 20,
-    color: '#d32f2f',
+  noTasksText: {
+    textAlign: 'center',
+    color: '#666',
+    marginTop: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -118,4 +129,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CompletedTasksScreen;
+export default TaskListScreen;

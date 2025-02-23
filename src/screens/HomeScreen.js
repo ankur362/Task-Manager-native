@@ -1,15 +1,17 @@
 import React, { useState, useCallback } from 'react';
-import { 
-  View, Text, FlatList, ActivityIndicator, StyleSheet, 
-  TouchableOpacity, Alert, TextInput 
+import {
+  View, Text, FlatList, ActivityIndicator, StyleSheet,
+  TouchableOpacity, Alert, TextInput
 } from 'react-native';
-import { 
-  useGetAllTasksQuery, 
-  useUpdateTaskMutation, 
-  useDeleteTaskMutation 
+import {
+  useGetAllTasksQuery,
+  useUpdateTaskMutation,
+  useDeleteTaskMutation
 } from '../api/tasksApi';
 import { useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faPlus, faEdit, faTrash, faCheck, faClock, faTasks, faUndo } from '@fortawesome/free-solid-svg-icons';
 
 const HomeScreen = () => {
   const { data: tasks, error, isLoading, refetch } = useGetAllTasksQuery();
@@ -21,14 +23,12 @@ const HomeScreen = () => {
   const [editedTitle, setEditedTitle] = useState('');
   const [editedDescription, setEditedDescription] = useState('');
 
-  // 🔄 Refetch data when screen is focused
   useFocusEffect(
     useCallback(() => {
       refetch();
     }, [])
   );
 
-  // ✅ Handle Task Completion
   const handleCompleteTask = async (task) => {
     try {
       await updateTask({ id: task._id, Completed_task: !task.Completed_task }).unwrap();
@@ -38,7 +38,6 @@ const HomeScreen = () => {
     }
   };
 
-  // ✅ Handle Task Deletion
   const handleDeleteTask = async (taskId) => {
     Alert.alert(
       "Delete Task",
@@ -60,14 +59,12 @@ const HomeScreen = () => {
     );
   };
 
-  // ✅ Enable Editing Mode
   const startEditing = (task) => {
     setEditingTaskId(task._id);
     setEditedTitle(task.title);
     setEditedDescription(task.description);
   };
 
-  // ✅ Update Task & Refresh UI
   const handleUpdateTask = async () => {
     try {
       await updateTask({ id: editingTaskId, title: editedTitle, description: editedDescription }).unwrap();
@@ -81,12 +78,15 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>📌 Task Manager</Text>
+        <Text style={styles.title}>
+          <FontAwesomeIcon icon={faTasks} size={24} color="#333" /> Task Manager
+        </Text>
         <TouchableOpacity
           style={styles.createButton}
           onPress={() => navigation.navigate('CreateTask')}
         >
-          <Text style={styles.createButtonText}>+ Add Task</Text>
+          <FontAwesomeIcon icon={faPlus} size={16} color="#fff" />
+          <Text style={styles.createButtonText}> Add Task</Text>
         </TouchableOpacity>
       </View>
 
@@ -115,7 +115,6 @@ const HomeScreen = () => {
   );
 };
 
-// ✅ Task Item Component (Handles Inline Editing)
 const TaskItem = ({
   task,
   onComplete,
@@ -150,74 +149,82 @@ const TaskItem = ({
         <>
           <Text style={styles.taskTitle}>{task.title}</Text>
           <Text style={styles.taskDescription}>{task.description}</Text>
-          <Text style={styles.dueDate}>🕒 Due: {task.due_date}</Text>
+          <Text style={styles.dueDate}>
+            <FontAwesomeIcon icon={faClock} size={14} color="#ff8c00" /> Due: {task.due_date}
+          </Text>
           <Text style={styles.taskStatus}>
-            {task.Completed_task ? '✅ Completed' : '⏳ Pending'}
+            {task.Completed_task ? (
+              <>
+                <FontAwesomeIcon icon={faCheck} size={14} color="green" /> Completed
+              </>
+            ) : (
+              <>
+                <FontAwesomeIcon icon={faClock} size={14} color="red" /> Pending
+              </>
+            )}
           </Text>
         </>
       )}
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.completeButton, task.Completed_task && styles.completed]}
+          style={[styles.button, task.Completed_task ? styles.undoButton : styles.doneButton]}
           onPress={() => onComplete(task)}
         >
-          <Text style={styles.completeButtonText}>
-            {task.Completed_task ? '✔' : '✔ Done'}
-          </Text>
+          <FontAwesomeIcon icon={task.Completed_task ? faUndo : faCheck} size={14} color="#fff" />
+          <Text style={styles.buttonText}> {task.Completed_task ? 'Undo' : 'Done'}</Text>
         </TouchableOpacity>
 
         {isEditing ? (
-          <TouchableOpacity style={styles.updateButton} onPress={onUpdate}>
-            <Text style={styles.buttonText}>🔄 Update</Text>
+          <TouchableOpacity style={[styles.button, styles.editButton]} onPress={onUpdate}>
+            <FontAwesomeIcon icon={faEdit} size={14} color="#fff" />
+            <Text style={styles.buttonText}> Update</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity style={styles.editButton} onPress={() => onEdit(task)}>
-            <Text style={styles.buttonText}>✏ Edit</Text>
+          <TouchableOpacity style={[styles.button, styles.editButton]} onPress={() => onEdit(task)}>
+            <FontAwesomeIcon icon={faEdit} size={14} color="#fff" />
+            <Text style={styles.buttonText}> Edit</Text>
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(task._id)}>
-          <Text style={styles.buttonText}>🗑 Delete</Text>
+        <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={() => onDelete(task._id)}>
+          <FontAwesomeIcon icon={faTrash} size={14} color="#fff" />
+          <Text style={styles.buttonText}> Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
-    padding: 20,
+    backgroundColor: '#f5f5f5',
+    padding: 20
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 10
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#333'
   },
   createButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 8,
+    backgroundColor: '#007bff'
+    , flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 8
   },
   createButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 16,
-    textAlign: 'center',
+    marginLeft: 5
   },
   taskCard: {
     backgroundColor: '#fff',
@@ -228,59 +235,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 5,
-    elevation: 3,
-  },
-  taskTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  taskDescription: {
-    fontSize: 16,
-    color: '#555',
-    marginTop: 5,
-  },
-  dueDate: {
-    fontSize: 14,
-    color: '#ff8c00',
-    marginTop: 5,
-  },
-  taskStatus: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginTop: 8,
-    color: '#ff8c00',
+    elevation: 3
   },
   buttonContainer: {
     flexDirection: 'row',
-    marginTop: 10,
     justifyContent: 'space-between',
+    marginTop: 10
   },
-  editButton: {
-    backgroundColor: '#007bff',
-    padding: 6,
-    borderRadius: 8,
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 8
   },
-  updateButton: {
-    backgroundColor: '#28a745',
-    padding: 6,
-    borderRadius: 8,
-  },
-  deleteButton: {
-    backgroundColor: 'red',
-    padding: 6,
-    borderRadius: 8,
-  },
+  doneButton: { backgroundColor: 'green' },
+  undoButton: { backgroundColor: 'orange' },
+  editButton: { backgroundColor: '#007bff' },
+  deleteButton: { backgroundColor: 'red' },
   buttonText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
-  },
-  input: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    fontSize: 16,
-    marginBottom: 5,
+    marginLeft: 5
   },
 });
 

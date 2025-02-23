@@ -50,7 +50,7 @@ const LoginScreen = ({ navigation }) => {
               style={[styles.input, { color: '#ff0000' }]} 
               placeholder="Password"
               placeholderTextColor="#aaa"
-              secureTextEntry={true}  // 👈 Shows dots (••••) instead of text
+              secureTextEntry={true}  
               onChangeText={handleChange('password')}
               onBlur={handleBlur('password')}
               value={values.password}
