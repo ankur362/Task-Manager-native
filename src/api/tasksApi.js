@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const tasksApi = createApi({
   reducerPath: 'tasksApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://task-manager-backend-nest-js-1.onrender.com/' }), // Keeping the original base URL
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://task-manager-backend-nest-js-1.onrender.com/' }), 
   endpoints: (builder) => ({
     getAllTasks: builder.query({
       query: () => 'tasks',

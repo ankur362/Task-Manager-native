@@ -14,7 +14,7 @@ import TaskListScreen from '../screens/TaskListScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// ✅ Home Stack Navigator (Hide Headers Inside)
+
 function HomeStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>  
@@ -24,7 +24,7 @@ function HomeStack() {
   );
 }
 
-// ✅ Categories Stack Navigator (Hide Headers Inside)
+
 function CategoriesStack() {
   return (
     <Stack.Navigator>
@@ -34,7 +34,7 @@ function CategoriesStack() {
   );
 }
 
-// ✅ Main Bottom Tab Navigator (Keep Only Main Tab Headers)
+
 export default function MainTabs() {
   return (
     <Tab.Navigator
