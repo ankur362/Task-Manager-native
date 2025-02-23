@@ -11,14 +11,14 @@ const CompletedTasksScreen = () => {
   const { data: completedTasks, isLoading, error, refetch } = useGetCompletedTasksQuery();
   const [deleteTask] = useDeleteTaskMutation();
 
-  // ✅ Fetch updated data when screen is focused
+
   useFocusEffect(
     useCallback(() => {
       refetch();
     }, [])
   );
 
-  // ✅ Handle Task Deletion
+ 
   const handleDeleteTask = async (taskId) => {
     try {
       await deleteTask(taskId);
