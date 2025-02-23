@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import { useSelector } from 'react-redux';
 
-const { width } = Dimensions.get('window'); // Get device width
+const { width } = Dimensions.get('window');
 
 export default function ProfileScreen() {
-  const user = useSelector((state) => state.auth.user); // Get user data from Redux
+  const user = useSelector((state) => state.auth.user);
 
   if (!user) {
     return (
@@ -24,6 +24,7 @@ export default function ProfileScreen() {
 
       {/* Profile Details */}
       <View style={styles.profileCard}>
+        <Text style={styles.profileTitle}>PROFILE DETAILS</Text>
         <ProfileDetail label="Name" value={user.name} />
         <ProfileDetail label="Username" value={`@${user.username}`} />
         <ProfileDetail label="Email" value={user.email} />
@@ -33,7 +34,6 @@ export default function ProfileScreen() {
   );
 }
 
-// Component for profile details
 const ProfileDetail = ({ label, value }) => (
   <View style={styles.detailContainer}>
     <Text style={styles.label}>{label}:</Text>
@@ -44,7 +44,7 @@ const ProfileDetail = ({ label, value }) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6', // Light gray background
+    backgroundColor: '#d9d9d9', 
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -52,43 +52,49 @@ const styles = StyleSheet.create({
   imageWrapper: {
     width: 130,
     height: 130,
-    borderRadius: 65,
-    overflow: 'hidden',
-    borderWidth: 4,
-    borderColor: '#ff8c00',
+    borderWidth: 3,
+    borderRadius:70,
+    borderColor: '#333',
+    backgroundColor: '#ccc',
     marginBottom: 20,
-    backgroundColor: '#fff', // White background for the image wrapper
   },
   profileImage: {
     width: '100%',
     height: '100%',
+    borderRadius:70,
   },
   profileCard: {
-    width: width * 0.9, // 90% of screen width
-    backgroundColor: '#ffffff', // White card background
+    width: width * 0.9,
+    backgroundColor: '#f0f0f0', 
     padding: 20,
-    borderRadius: 15,
     alignItems: 'flex-start',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 6,
-    elevation: 5, // Shadow for Android
+  },
+  profileTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 10,
+    textAlign: 'left',
   },
   detailContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
+    paddingBottom: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#999',
+    width: '100%',
   },
   label: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#333', // Darker text for readability
-    marginRight: 10,
+    color: '#222',
+    width: 100,
   },
   value: {
-    fontSize: 18,
-    color: '#555', // Slightly darker gray for contrast
+    fontSize: 16,
+    color: '#444',
+    flexShrink: 1,
   },
   errorText: {
     color: 'red',
