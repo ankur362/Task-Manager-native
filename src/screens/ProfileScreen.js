@@ -1,11 +1,20 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
-import { useSelector } from 'react-redux';
+import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../store/authSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('user'); 
+    dispatch(logout()); 
+    navigation.replace('Login'); 
+  };
 
   if (!user) {
     return (
@@ -17,6 +26,11 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Logout Button */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
+
       {/* Profile Image */}
       <View style={styles.imageWrapper}>
         <Image source={{ uri: user.image }} style={styles.profileImage} />
@@ -26,9 +40,7 @@ export default function ProfileScreen() {
       <View style={styles.profileCard}>
         <Text style={styles.profileTitle}>PROFILE DETAILS</Text>
         <ProfileDetail label="Name" value={user.name} />
-        <ProfileDetail label="Username" value={`@${user.username}`} />
-        <ProfileDetail label="Email" value={user.email} />
-        <ProfileDetail label="Mobile" value={user.mobile} />
+        <ProfileDetail label="ID" value={user.id} />
       </View>
     </View>
   );
@@ -44,16 +56,29 @@ const ProfileDetail = ({ label, value }) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#d9d9d9', 
+    backgroundColor: '#d9d9d9',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+  },
+  logoutButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+  },
+  logoutText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   imageWrapper: {
     width: 130,
     height: 130,
     borderWidth: 3,
-    borderRadius:70,
+    borderRadius: 70,
     borderColor: '#333',
     backgroundColor: '#ccc',
     marginBottom: 20,
@@ -61,11 +86,11 @@ const styles = StyleSheet.create({
   profileImage: {
     width: '100%',
     height: '100%',
-    borderRadius:70,
+    borderRadius: 70,
   },
   profileCard: {
     width: width * 0.9,
-    backgroundColor: '#f0f0f0', 
+    backgroundColor: '#f0f0f0',
     padding: 20,
     alignItems: 'flex-start',
   },
@@ -102,3 +127,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+
