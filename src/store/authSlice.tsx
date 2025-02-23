@@ -30,7 +30,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
-      AsyncStorage.removeItem('user'); // Remove from AsyncStorage
+      AsyncStorage.removeItem('user'); 
     },
     setUserFromStorage: (state, action: PayloadAction<User | null>) => {
       state.user = action.payload;
